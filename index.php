@@ -18,6 +18,7 @@ echo <<<HEAD
     </style>
     </head>
     <body>
+        <p style="text-align:right;">View <a href="/ef/zoom/">Zoom history</a></p>
 HEAD;
 
 // Connect to the database
