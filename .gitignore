@@ -1,0 +1,5 @@
+.htaccess
+error_log
+php_errors.log
+php_error.log
+env.php
