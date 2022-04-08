@@ -83,13 +83,15 @@ if ($debug) {
 
 // Get Fields by Layout, and remove the ones we want as first
 $specialColumns  = ['f_name','l_name','email'];
-$elements = $form['layout'][0]['elements']; //All the fields in the form
+$elements = [];
+foreach($form['layout'] as $tab)
+    $elements = [...$elements, ...$tab['elements']]; //All the fields in the form
 $fieldsByLayout = []; $options = [];
 if ($debug) echo "<table><tr>";
 foreach($elements as $layoutIndex => $element) {
     $type   = $element['type'];
     $m_type = $element['m_type'];
-    if (false === array_search($type, $specialColumns) & $type !== 'embed' & $m_type !=='design') {
+    if (false === array_search($type, $specialColumns) & $type !== 'embed' & $m_type !=='design' & $type!=='mathematical') {
         $key    = $element['key'];
         $title  = $form[$m_type][$key]['title']
                   . ($form[$m_type][$key]['subtitle'] ? ' ~ '.$form[$m_type][$key]['subtitle'] : '');
@@ -112,7 +114,7 @@ foreach($elements as $layoutIndex => $element) {
 }
 if ($debug) echo "</tr></table>";
 $columns  = ['f_name','l_name','email','amount','date'];
-//echo "<pre>".var_export($options,true)."</pre>";
+//echo "<pre>".var_export($fieldsByLayout,true)."</pre>";
 
 
 /*
@@ -172,6 +174,8 @@ function makeTable($signups, $inc = 1, $count = true) {
     foreach ($fieldsByLayout as $f)
         echo "<th>$f[title]</th>";
     echo "</tr>\n</thead>\n";
+
+    // Table data
     $x = ($inc < 0) ? count($signups) : 1;
     foreach ($signups as $i => $s) {
         echo "<tr><td>$x</td>"; $x = $x + $inc;
