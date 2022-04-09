@@ -156,9 +156,9 @@ function makeTable($signups, $inc = 1, $count = true) {
     $x = ($inc < 0) ? count($signups) : 1;
     foreach ($signups as $i => $s) {
         echo "<tr><td>$x</td>"; $x = $x + $inc;
-        $s['mcq']      = unserialize($s['mcq']);
-        $s['freetype'] = unserialize($s['freetype']);
-        $s['pinfo']    = unserialize($s['pinfo']);
+        $s['mcq']      = array_key_exists('mcq',      $s) ? unserialize($s['mcq'])      : [];
+        $s['freetype'] = array_key_exists('freetype', $s) ? unserialize($s['freetype']) : [];
+        $s['pinfo']    = array_key_exists('pinfo',    $s) ? unserialize($s['pinfo'])    : [];
 
         //Display the standard columns
         foreach ($columns as $c) 
@@ -168,29 +168,31 @@ function makeTable($signups, $inc = 1, $count = true) {
         foreach ($fieldsByLayout as $f) { 
             $m_type   = $f['m_type'];
             $question = $f['key'];
-            switch ($m_type) {
-                case 'mcq':
-                    if ($options[$question] === 'slider') {
-                        $td = $s[$m_type][$question]['value'];
-                    } else {
-                        $answerNum = $s[$m_type][$question]['options'][0];
-                        $td = $options[$question][$answerNum]['title'];
-                        if ($count) $options[$question][$answerNum]['count']++; 
-                        if (!$td & $formNum==85) {
-                            $td = $answerNum;
+            if (array_key_exists($m_type, $s)) {
+                switch ($m_type) {
+                    case 'mcq':
+                        if ($options[$question] === 'slider') {
+                            $td = $s[$m_type][$question]['value'];
+                        } else {
+                            $answerNum = $s[$m_type][$question]['options'][0];
+                            $td = $options[$question][$answerNum]['title'];
+                            if ($count) $options[$question][$answerNum]['count']++; 
+                            if (!$td & $formNum==85) {
+                                $td = $answerNum;
+                            }
                         }
-                    }
-                    break;
-                case 'freetype':
-                    $td = $s[$m_type][$question]['value'];
-                    break;
-                case 'pinfo':
-                    $answerNum = $s[$m_type][$question]['options'][0];
-                    $td = $form[$m_type][$question]['settings']['options'][$answerNum]['label'];
-                    break;
-                default:
-                    $td = $m_type;
-            }
+                        break;
+                    case 'freetype':
+                        $td = $s[$m_type][$question]['value'];
+                        break;
+                    case 'pinfo':
+                        $answerNum = $s[$m_type][$question]['options'][0];
+                        $td = $form[$m_type][$question]['settings']['options'][$answerNum]['label'];
+                        break;
+                    default:
+                        $td = $m_type;
+                }
+            } else $td = ' ';
             echo "<td>$td</td>";
         }
         echo "</tr>\n";
