@@ -31,7 +31,7 @@ if (!$formNum) { //If no form number was given, display some choices
     $forms = $result->fetch_all(MYSQLI_ASSOC); 
     echo "<table><tr><th>Form</th><th>Signups</th><th>Registration Data</th><th>Original</th></tr>\n";
     foreach ($forms as $form) {
-        $result = $mysqli->query("SELECT COUNT(*) AS count FROM {$pfx}fsq_payment WHERE form_id=$form[id]")->fetch_assoc();
+        $result = $mysqli->query("SELECT COUNT(*) AS count FROM {$pfx}fsq_data WHERE form_id=$form[id]")->fetch_assoc();
         echo "<tr>
             <td class='r'>$form[id]</td>
             <td class='c'>$result[count]</td>
