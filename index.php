@@ -117,44 +117,21 @@ $columns  = ['f_name','l_name','email','amount','date'];
 //echo "<pre>".var_export($fieldsByLayout,true)."</pre>";
 
 
-/*
-// *** Display sorting options ***
-echo <<<FORMSTART
-<form action="$_SERVER[REQUEST_URI]" method="GET">
-    <input type="submit" value="GATE GATE">
-    <table>
-    <thead><tr><th>Sort</th><th>Show</td><th>Field</th></tr></thead>
-    <tbody>
-FORMSTART;
-foreach($fieldsByKey as $q => $option) {
-    echo <<<FORMROW
-        <tr>
-            <td><input type='radio' name='sortby'></td><td><input type='checkbox' name='include'></td><td>$option[title] ($q)</td>
-        </tr>
-FORMROW;
-}
-echo <<<FORMEND
-    </tbody>
-    </table>
-</form>
-FORMEND;
-*/
-
 
 /***********************************************
  *           OK, show that data!               *
  ***********************************************/
 
 
-//*** Show the signups - Most recent first ***
-$mainQuery = "SELECT f_name,l_name,email,amount,`{$pfx}fsq_payment`.`date`,freetype,mcq 
-            FROM `{$pfx}fsq_payment` 
-            LEFT JOIN {$pfx}fsq_data 
-                ON `{$pfx}fsq_payment`.`data_id`=`{$pfx}fsq_data`.`id` 
-            WHERE `{$pfx}fsq_payment`.`form_id`=$formNum ";
+//*** Show the signups in two ways ***
+$mainQuery = "SELECT f_name,l_name,email,amount,{$pfx}fsq_data.date,freetype,mcq 
+            FROM       {$pfx}fsq_data 
+            LEFT JOIN `{$pfx}fsq_payment` 
+                ON `{$pfx}fsq_data`.`id`=`{$pfx}fsq_payment`.`data_id`
+            WHERE `{$pfx}fsq_data`.`form_id`=$formNum ";
 
 echo "<h2>Most Recent</h2>\n";
-$result  = $mysqli->query($mainQuery. "ORDER BY `{$pfx}fsq_payment`.`date` DESC");
+$result  = $mysqli->query($mainQuery. "ORDER BY `{$pfx}fsq_data`.`date` DESC");
 $signups = $result->fetch_all(MYSQLI_ASSOC); 
 makeTable($signups, -1);
 
@@ -182,9 +159,13 @@ function makeTable($signups, $inc = 1, $count = true) {
         $s['mcq']      = unserialize($s['mcq']);
         $s['freetype'] = unserialize($s['freetype']);
         $s['pinfo']    = unserialize($s['pinfo']);
-        foreach ($columns as $c)
+
+        //Display the standard columns
+        foreach ($columns as $c) 
             echo '<td>'.$s[$c].'</td>';
-        foreach ($fieldsByLayout as $f) {
+
+        //Display the rest of the columns
+        foreach ($fieldsByLayout as $f) { 
             $m_type   = $f['m_type'];
             $question = $f['key'];
             switch ($m_type) {
